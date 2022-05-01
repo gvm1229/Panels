@@ -9,6 +9,6 @@ Key features of the web app
 
 Collaborators
 
-- Coby Yee
-- David Huang
+- Coby Yee @ https://github.com/CobyYee
+- David Huang @ https://github.com/Glissen
 - Noah Chen

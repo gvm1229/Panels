@@ -1,0 +1,426 @@
+{
+	"info": {
+		"_postman_id": "60918167-4909-41fd-a3ed-e1a3438558ee",
+		"name": "User_Requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register: JohnDoe 200",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"johndoe@gmail.com\",\n    \"username\": \"JohnDoe\",\n    \"password\": \"johndoe123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/register",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSession: JohnDoe 401",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"johndoe@gmail.com\",\n    \"password\": \"JohnDoe123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/getSession",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"getSession"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login: JohnDoe 400 Email DNE",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"johndoe@gmail.co\",\n    \"password\": \"JohnDoe123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/login",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login: JohnDoe 401",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"johndoe@gmail.com\",\n    \"password\": \"JohnDoe12\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/login",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login: JohnDoe 200",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"johndoe@gmail.com\",\n    \"password\": \"JohnDoe123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/login",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSession: JohnDoe 200",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjQ1MGI3ZDg1ODJjNWZiZjkzOTBiNDAiLCJpYXQiOjE2NDg2OTM0ODksImV4cCI6MTY0ODY5NzA4OX0.QXfHoBQ8s3qZoRzAY_i-nVzpteDYGY3_v4KA68L21KA; Path=/; Secure; HttpOnly;",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"johndoe@gmail.com\",\n    \"password\": \"JohnDoe123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/getSession",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"getSession"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PasswordRecovery: NoahChen 400",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"noah.chen@stonybrook.ed\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/passwordRecovery",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"passwordRecovery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PasswordRecovery: CobyYee200",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"coby610@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/passwordRecovery",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"passwordRecovery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SaveNewPassword: NoahChen 400 Expired",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"62450146da08ded53242ba17\",\n    \"token\": \"782432d62d0ad13a5fa5586ff5bfb1b5406b241e7ddeb7975d85f6d2a159b4fb\",\n    \"newPassword\": \"17Letterpassword!!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/saveNewPassword",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"saveNewPassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SaveNewPassword: CobyYee 200",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"62450067da08ded53242ba16\",\n    \"token\": \"36fc04d52d192b83f98a93d8b3195a347fcb991ede078d0f52783b97ddf72aee\",\n    \"newPassword\": \"17Letterpassword!!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/saveNewPassword",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"saveNewPassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ban: John Doe 200",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjQ1MDA2N2RhMDhkZWQ1MzI0MmJhMTYiLCJpYXQiOjE2NDg3NTM2MjEsImV4cCI6MTY0ODc1NzIyMX0.g8PNCqeNW8FEHjtK4xQqEePuG1WgnWIuqncmjw2DOOg; Path=/; Secure; HttpOnly;",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"62450067da08ded53242ba16\",\n    \"targetUserId\": \"62450b7d8582c5fbf9390b40\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/ban",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"ban"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unban: John Doe 200",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjQ1MDA2N2RhMDhkZWQ1MzI0MmJhMTYiLCJpYXQiOjE2NDg3NTM2MjEsImV4cCI6MTY0ODc1NzIyMX0.g8PNCqeNW8FEHjtK4xQqEePuG1WgnWIuqncmjw2DOOg; Path=/; Secure; HttpOnly;",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"62450067da08ded53242ba16\",\n    \"targetUserId\": \"62450b7d8582c5fbf9390b40\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/unban",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"unban"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout: JohnDoe 200",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://panelswebcomics.herokuapp.com/api/logout",
+					"protocol": "https",
+					"host": [
+						"panelswebcomics",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"api",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

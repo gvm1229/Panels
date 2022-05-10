@@ -10,22 +10,31 @@ export const GlobalStoreActionType = {
     SWITCH_MODE: "SWITCH_MODE",
     HOME: "HOME",
     LOAD_WORKS: "LOAD_WORKS",
+    LOAD_FILTERED_WORKS: "LOAD_FILTERED_WORKS",
+    LOAD_BOOKMARKS: "LOAD_BOOKMARKS",
     LOAD_WORK: "LOAD_WORK",
+    LOAD_WORK_AND_CHAPTER: "LOAD_WORK_AND_CHAPTER",
     LOAD_PROFILE_WORKS: "LOAD_PROFILE_WORKS",
-    LOAD_CHAPTER: "LOAD_CHAPTER",
+    LOAD_COMIC_CHAPTER: "LOAD_COMIC_CHAPTER",
+    LOAD_STORY_CHAPTER: "LOAD_STORY_CHAPTER",
+    UPDATE_COMIC_CHAPTER: "UPDATE_COMIC_CHAPTER",
+    UPDATE_STORY_CHAPTER: "UPDATE_STORY_CHAPTER",
     SEARCH: "SEARCH",
     LOAD_IMAGES: "LOAD_IMAGES",
     LOAD_HOME: "LOAD_HOME"
 }
 
+
 function GlobalStoreContextProvider(props) {
     const navigate = useNavigate();
     const {auth} = useContext(AuthContext)
+    const genres = ["Action", "Fantasy", "Romance", "Reincarnation", "Martial Arts", "Slice of Life", "Sports"];  
 
     const [store, setStore] = useState({
         mode: "comic",
         works: [],
         work: null,
+        filteredWorks: [],
         images: [],
         image: null,
         chapter: null,
@@ -39,6 +48,7 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     mode: (store.mode === "comic") ? "story" : "comic",
                     works: [],
+                    filteredWorks: [],
                     work: null,
                     images: null,
                     image: null,
@@ -50,8 +60,33 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     mode: store.mode,
                     works: payload.works,
+                    filteredWorks: payload.works,
                     work: null,
                     images: payload.images,
+                    image: null,
+                    chapter: null,
+                    chapter_images: null
+                })
+            }
+            case GlobalStoreActionType.LOAD_FILTERED_WORKS: {
+                return setStore({
+                    mode: store.mode,
+                    works: payload.works ? payload.works : store.works,
+                    filteredWorks: payload.filtered,
+                    work: null,
+                    images: payload.images,
+                    image: null,
+                    chapter: null,
+                    chapter_images: null
+                })
+            }
+            case GlobalStoreActionType.LOAD_BOOKMARKS: {
+                return setStore({
+                    mode: store.mode,
+                    works: payload,
+                    filteredWorks: store.filteredWorks,
+                    work: null,
+                    images: store.images,
                     image: null,
                     chapter: null,
                     chapter_images: null
@@ -61,6 +96,7 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     mode: store.mode,
                     works: payload,
+                    filteredWorks: store.filteredWorks,
                     work: null,
                     images: store.images,
                     image: null,
@@ -72,6 +108,7 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     mode: store.mode,
                     works: store.works,
+                    filteredWorks: store.filteredWorks,
                     work: payload.work,
                     images: store.images,
                     image: payload.image,
@@ -79,21 +116,71 @@ function GlobalStoreContextProvider(props) {
                     chapter_images: null
                 })
             }
-            case GlobalStoreActionType.LOAD_CHAPTER: {
+            case GlobalStoreActionType.LOAD_WORK_AND_CHAPTER: {
                 return setStore({
                     mode: store.mode,
                     works: store.works,
+                    filteredWorks: store.filteredWorks,
+                    work: payload.work,
+                    images: store.images,
+                    image: payload.cover_image,
+                    chapter: payload.chapter,
+                    chapter_images: payload.chapter_images
+                })
+            }
+            case GlobalStoreActionType.LOAD_COMIC_CHAPTER: {
+                return setStore({
+                    mode: store.mode,
+                    works: store.works,
+                    filteredWorks: store.filteredWorks,
                     work: store.work,
                     images: store.images,
-                    image: null,
+                    image: store.image,
                     chapter: payload.chapter,
                     chapter_images: payload.images
+                })
+            }
+            case GlobalStoreActionType.LOAD_STORY_CHAPTER: {
+                return setStore({
+                    mode: store.mode,
+                    works: store.works,
+                    filteredWorks: store.filteredWorks,
+                    work: store.work,
+                    images: store.images,
+                    image: store.image,
+                    chapter: payload,
+                    chapter_images: null
+                })
+            }
+            case GlobalStoreActionType.UPDATE_COMIC_CHAPTER: {
+                return setStore({
+                    mode: store.mode,
+                    works: store.works,
+                    filteredWorks: store.filteredWorks,
+                    work: store.work,
+                    images: store.images,
+                    image: store.image,
+                    chapter: payload.chapter,
+                    chapter_images: payload.images
+                })
+            }
+            case GlobalStoreActionType.UPDATE_STORY_CHAPTER: {
+                return setStore({
+                    mode: store.mode,
+                    works: store.works,
+                    filteredWorks: store.filteredWorks,
+                    work: store.work,
+                    images: store.images,
+                    image: store.image,
+                    chapter: payload,
+                    chapter_images: null
                 })
             }
             case GlobalStoreActionType.LOAD_IMAGES: {
                 return setStore({
                     mode: store.mode,
                     works: store.works,
+                    filteredWorks: store.filteredWorks,
                     work: store.work,
                     images: payload,
                     image: null,
@@ -105,6 +192,7 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     mode: store.mode,
                     works: payload.works,
+                    filteredWorks: payload.works,
                     work: store.work,
                     images: payload.images,
                     image: null,
@@ -145,6 +233,7 @@ function GlobalStoreContextProvider(props) {
             data: data
         });
         if (response.status === 200) {
+            console.log("konva created: " + response.data.data)
             storeReducer({
                 type: GlobalStoreActionType.LOAD_PROFILE_WORKS,
                 payload: store.works
@@ -167,30 +256,28 @@ function GlobalStoreContextProvider(props) {
 
     store.home = async function() {
         try {
+            let response = null;
             if (store.mode === "comic") {
-                let res = await api.getAllComics();
-                if (res.status === 200) {
-                    let comics = res.data.data;
-                    let works = comics.slice();
-                    let featuredWorks = works.sort((a, b) => { return b.views - a.views}).slice(0, 8);
-                    let imageIds = [];
-                    for (let i = 0; i < featuredWorks.length && i < 8; i++) {
-                        imageIds.push(featuredWorks[i].cover);
-                    }
-                    const response = await api.getImagesById(imageIds);
-                    if (response.status === 200) {
-                        let images = response.data.data;
-                        storeReducer({
-                            type: GlobalStoreActionType.LOAD_HOME,
-                            payload: {
-                                works: comics,
-                                images: images
-                            }
-                        })
-                    }
-                    navigate("/")
-                }
-                else {
+                response = await api.getAllComics();
+            }
+            else {
+                response = await api.getAllStories();
+            }
+            if (response.status === 200) {
+                let data = response.data.data;
+                let works = data.filter(work => work.published !== null).slice(0, 8);
+                let featuredWorks = works.sort((a, b) => { return b.views - a.views});
+                let imageIds = featuredWorks.map(work => work.cover);
+                response = await api.getImagesById(imageIds);
+                if (response.status === 200) {
+                    let images = response.data.data;
+                    storeReducer({
+                        type: GlobalStoreActionType.LOAD_HOME,
+                        payload: {
+                            works: featuredWorks,
+                            images: images
+                        }
+                    })
                 }
             }
         }
@@ -199,16 +286,108 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    store.sortWorks = async function(value) {
+        let sorted = store.filteredWorks.slice();
+        let sortedAll = store.works.slice();
+        if (value == 0) {
+            sorted = sorted.sort((a, b) => { return (b.published > a.published) - (b.published < a.published) });
+            sortedAll = sorted.sort((a, b) => { return (b.published > a.published) - (b.published < a.published) });
+        }
+        else if (value == 1) {
+            sorted = sorted.sort((a, b) => { return b.views-a.views });
+            sortedAll = sorted.sort((a, b) => { return b.views-a.views });
+            
+        }
+        else if (value == 2) {
+            sorted = sorted.sort((a, b) => {
+                let ratingA = 0;
+                let ratingB = 0;
+                if (a.ratings.length > 0) {
+                    ratingA = a.ratings.reduce((i, j) => i + j, 0)/a.ratings.length;
+                }
+                if (b.ratings.length > 0) {
+                    ratingB = b.ratings.reduce((i, j) => i + j, 0)/b.ratings.length;
+                }
+                return ratingB - ratingA;
+            })
+
+            sortedAll = sortedAll.sort((a, b) => {
+                let ratingA = 0;
+                let ratingB = 0;
+                if (a.ratings.length > 0) {
+                    ratingA = a.ratings.reduce((i, j) => i + j, 0)/a.ratings.length;
+                }
+                if (b.ratings.length > 0) {
+                    ratingB = b.ratings.reduce((i, j) => i + j, 0)/b.ratings.length;
+                }
+                return ratingB - ratingA;
+            })
+        }
+        else if (value == 3) {
+            sorted = sorted.sort((a, b) => { return a.title.localeCompare(b.title) });
+            sortedAll = sortedAll.sort((a, b) => { return a.title.localeCompare(b.title) });
+        }
+        let imageIds = sorted.map(work => work.cover);
+        let response = await api.getImagesById(imageIds);
+        if (response.status === 200) {
+            let images = response.data.data;
+            storeReducer({
+                type: GlobalStoreActionType.LOAD_FILTERED_WORKS,
+                payload: {
+                    works: sortedAll,
+                    filtered: sorted,
+                    images: images
+                }
+            })
+        }
+    }
+
+    store.filterWorks = async function(state) {
+        let arr = [];
+        let filtered = [];
+        for (let i = 0; i < state.length; i++) {
+            if (state[i]) {
+                arr.push(i);
+            }
+        }
+        console.log(store.works)
+        let works_arr = store.works.slice();
+        for (let i = 0; i < works_arr.length; i++) {
+            let good = true;
+            for (let j = 0; j < arr.length; j++) {
+                if (!works_arr[i].genres.includes(genres[arr[j]])) {
+                    good = false;
+                    break;
+                }
+            }
+            if (good)
+                filtered.push(works_arr[i]);
+        }
+        let imageIds = filtered.map(work => work.cover);
+        let response = await api.getImagesById(imageIds);
+        if (response.status === 200) {
+            let images = response.data.data;
+            storeReducer({
+                type: GlobalStoreActionType.LOAD_FILTERED_WORKS,
+                payload: {
+                    works: null,
+                    filtered: filtered,
+                    images: images
+                }
+            })
+        }
+    }
+
     store.listScreen = async function() {
         let response = null;
         if (store.mode === "comic") {
-            response = await api.getAllComics();            
+            response = await api.getAllComics();           
         }
         else {
             response = await api.getAllStories();
         }
         if (response.status === 200) {
-            let works = response.data.data;
+            let works = response.data.data.filter(work => work.published !== null);
             let imageIds = [];
             for (let i = 0; i < works.length; i++) {
                 imageIds.push(works[i].cover);
@@ -335,6 +514,52 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    store.loadWorkAndChapter = async function(workId, chapterId) {
+        let response = null;
+        if (store.mode === "comic") {
+            response = await api.getComicById(workId);
+        }
+        else {
+            response = await api.getStoryById(workId);
+        }
+        if (response.status === 200) {
+            let currentWork = null;
+            if (store.mode === "comic") {
+                currentWork = response.data.comic;
+            }
+            else {
+                currentWork = response.data.story;
+            }
+            response = await api.getImagesById([currentWork.cover]);
+            if (response.status === 200) {
+                let cover_image = response.data.data;
+                if (store.mode === "comic") {
+                    response = await api.getComicChapterById(chapterId);
+                }
+                else {
+                    response = await api.getStoryChapterById(chapterId);
+                }
+                if (response.status === 200) {
+                    let chapter = response.data.data;
+                    let chapter_images = chapter.images;
+                    response = await api.getImagesById(chapter_images);
+                    if (response.status === 200) {
+                        let images = response.data.data;
+                        storeReducer({
+                            type: GlobalStoreActionType.LOAD_WORK_AND_CHAPTER,
+                            payload: {
+                                work: currentWork,
+                                cover_image: cover_image,
+                                chapter: chapter,
+                                chapter_images: images
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }
+
     store.deleteWork = async function (id) {
         let response = null;
         if (store.mode === "comic") {
@@ -348,7 +573,7 @@ function GlobalStoreContextProvider(props) {
             //let chapters = response.data.chapters;
             //for (const chapter of chapters) {
             //      console.log(chapter)
-            //      response = await api.deleteChapter(chapter)
+            //      response = await api.deleteComicChapter(chapter)
             //      if (response.status !== 200) {
             //          continue;
             //      }
@@ -408,7 +633,7 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.updateComic = async function(newTitle, newFile, newDescription, newTags) {
+    store.updateWork = async function(newTitle, newFile, newDescription, newTags) {
         let currentDraft = store.work;
         currentDraft.title = newTitle;
         currentDraft.cover = newFile;
@@ -433,6 +658,8 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    //No longer used. Refer to loadWork
+    /*
     store.loadComic = async function(id) {
         const response = await api.getComicById(id);
         if (response.status === 200) {
@@ -446,6 +673,7 @@ function GlobalStoreContextProvider(props) {
             console.log("Failed to load comic: " + id);
         }
     }
+    */
 
     store.createComicChapter = async function(comicId, chapterName, images) {
         const comicChapter = {
@@ -466,8 +694,11 @@ function GlobalStoreContextProvider(props) {
                 response = await api.updateComic(comic);
                 if (response.status === 200) {
                     storeReducer({
-                        type: GlobalStoreActionType.LOAD_CHAPTER,
-                        payload: newChapter
+                        type: GlobalStoreActionType.LOAD_COMIC_CHAPTER,
+                        payload: {
+                            chapter: newChapter,
+                            chapter_images: images
+                        }
                     })
                     console.log("comic updated")
                 }
@@ -486,7 +717,7 @@ function GlobalStoreContextProvider(props) {
             if (response.status === 200) {
                 let newImages = response.data.data;
                 storeReducer({
-                    type: GlobalStoreActionType.LOAD_CHAPTER,
+                    type: GlobalStoreActionType.UPDATE_COMIC_CHAPTER,
                     payload: {
                         chapter: updated,
                         chapter_images: newImages
@@ -505,7 +736,7 @@ function GlobalStoreContextProvider(props) {
             if (response.status === 200) {
                 let images = response.data.data
                 storeReducer({
-                    type: GlobalStoreActionType.LOAD_CHAPTER,
+                    type: GlobalStoreActionType.LOAD_COMIC_CHAPTER,
                     payload: {
                         chapter: chapter,
                         images: images
@@ -570,6 +801,8 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    // No longer used. Refer to loadWork
+    /*
     store.loadStory = async function(id) {
         const response = await api.getStoryById(id);
         if (response.status === 200) {
@@ -585,11 +818,12 @@ function GlobalStoreContextProvider(props) {
             console.log("Failed to load story: " + id);
         }
     }
+    */
 
-    store.createStoryChapter = async function(storyId, chapterName) {
+    store.createStoryChapter = async function(storyId, chapterName, chapter) {
         const storyChapter = {
             name: chapterName,
-            chapter: "check"
+            chapter: chapter
         }
         let response = await api.createStoryChapter(storyChapter);
         if (response.status === 200) {
@@ -605,7 +839,7 @@ function GlobalStoreContextProvider(props) {
                 response = await api.updateStory(story);
                 if (response.status === 200) {
                     storeReducer({
-                        type: GlobalStoreActionType.LOAD_CHAPTER,
+                        type: GlobalStoreActionType.LOAD_STORY_CHAPTER,
                         payload: newChapter
                     })
                     console.log("story updated")
@@ -625,11 +859,8 @@ function GlobalStoreContextProvider(props) {
         if (response.status === 200) {
             let updated = response.data.data;
             storeReducer({
-                type: GlobalStoreActionType.LOAD_CHAPTER,
-                payload: {
-                    chapter: updated,
-                    chapter_images: store.chapter_images
-                }
+                type: GlobalStoreActionType.UPDATE_STORY_CHAPTER,
+                payload: updated
             })
         }
     }
@@ -639,11 +870,8 @@ function GlobalStoreContextProvider(props) {
         if (response.status === 200) {
             let chapter = response.data.data;
             storeReducer({
-                type: GlobalStoreActionType.LOAD_CHAPTER,
-                payload: {
-                    chapter: chapter,
-                    images: store.images
-                }
+                type: GlobalStoreActionType.LOAD_STORY_CHAPTER,
+                payload: chapter
             })
         }
         else {
@@ -744,6 +972,59 @@ function GlobalStoreContextProvider(props) {
         }
         else {
             console.log("Failed to load works by creator_id: " + id);
+        }
+    }
+
+    store.loadBookmarks = async function(ids) {
+        let response = null;
+        if (store.mode === "comic") {
+            response = await api.getComicsById(ids);
+        }
+        else {
+            response = await api.getStoriesById(ids);
+        }
+        if (response.status === 200) {
+            let bookmarks = response.data.data;
+            storeReducer({
+                type: GlobalStoreActionType.LOAD_BOOKMARKS,
+                payload: bookmarks
+            })
+        }
+    }
+
+    store.removeBookmark = async function(id) {
+        let newWorks = store.works.slice().filter(work => work._id !== id);
+        storeReducer({
+            type: GlobalStoreActionType.LOAD_BOOKMARKS,
+            payload: newWorks
+        })
+    }
+
+    store.addRating = async function(id, rating) {
+        let newWork = store.work;
+        newWork.ratings.push(JSON.stringify({
+            userId: id,
+            rating: rating
+        }));
+        let response = null;
+        if (store.mode === "comic") {
+            response = await api.updateComic(newWork);
+        }
+        else {
+            response = await api.updateStory(newWork);
+        }
+        if (response.status === 200) {
+            storeReducer({
+                type: GlobalStoreActionType.LOAD_WORK,
+                payload: {
+                    work: newWork,
+                    image: store.image
+                }
+            })
+            console.log("success");
+        }
+        else {
+            console.log("failed");
         }
     }
 

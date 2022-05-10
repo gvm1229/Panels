@@ -78,6 +78,9 @@ getComicById = async (req, res) => {        // tested 200
         const found = await Comic.findById(req.params.id);
         if (!found)
             return res.status(400).json({success: false, message: "Comic not found"});
+
+        found.views++;
+        await found.save();
         
         return res.status(200).json({success: true, comic: found});
     }
@@ -97,6 +100,26 @@ getComics = async(req, res) => {        // tested 200
     }
 }
 
+getComicsById = async (req, res) => {
+    try {
+        const ids = req.body;
+        if (!ids)
+            return res.status(400).json({ success: false, errorMessage: "Missing image ids"});
+        let arr = [];
+        for (let i = 0; i < ids.length; i++) {
+            let found = await Comic.findById(ids[i]);
+            if (!found)
+                return res.status(400).json({ success: false, errorMessage: "Comic " + ids[i] + " not found!"});
+            arr.push(found);
+        }
+        
+        return res.status(200).json({ success: true, data: arr });
+    }
+    catch (err) {
+        return res.status(500);
+    }
+}
+
 getImagesById = async (req, res) => {
     try {
         const ids = req.body;
@@ -109,7 +132,6 @@ getImagesById = async (req, res) => {
                 return res.status(400).json({ success: false, errorMessage: "Image " + ids[i] + " not found!"})
             arr.push(found.data.toString())
         }
-        
         return res.status(200).json({ success: true, data: arr });
     }
     catch (err) {
@@ -142,6 +164,7 @@ updateComic = async (req, res) => {     // tested 200
         old.genres = body.genres;
         old.description = body.description;
         old.published = body.published;
+        old.ratings = body.ratings;
         old.chapters = body.chapters;
         //old.comments = body.comments;
 
@@ -207,7 +230,7 @@ getComicsByCreator = async (req, res) => {
     }
 }
 
-createChapter = async (req, res) => {       // tested 200
+createComicChapter = async (req, res) => {       // tested 200
     try {
         const { name, images } = req.body;
         if (!images || !name)
@@ -232,7 +255,7 @@ createChapter = async (req, res) => {       // tested 200
     }
 }
 
-updateChapter = async (req, res) => {
+updateComicChapter = async (req, res) => {
     try {
         const body = req.body;
         if(!body) {
@@ -258,7 +281,7 @@ updateChapter = async (req, res) => {
     }   
 }
 
-getChapterById = async(req, res) => {       // tested 200
+getComicChapterById = async(req, res) => {       // tested 200
     try {
         const id = req.params.id;
         if (!id) 
@@ -275,7 +298,7 @@ getChapterById = async(req, res) => {       // tested 200
     }
 }
 
-deleteChapter = async(req, res) => {    // tested 200
+deleteComicChapter = async(req, res) => {    // tested 200
     try {
         const id = req.params.id;
         const deleted = await ComicChapter.deleteOne({_id: id});
@@ -340,12 +363,13 @@ module.exports = {
     getComicsByName,
     getComicsByCreator,
     getComics,
+    getComicsById,
     getImagesById,
     updateComic,
-    createChapter,
-    updateChapter,
-    getChapterById,
-    deleteChapter,
+    createComicChapter,
+    updateComicChapter,
+    getComicChapterById,
+    deleteComicChapter,
     createKonva,
     getKonvasById,
     //getChaptersByFilter

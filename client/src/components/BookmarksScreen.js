@@ -1,54 +1,93 @@
-import { Typography, Box, Grid, List, ListItem, Button, Divider } from '@mui/material';
-import { useContext } from 'react'
+import { Box, Grid, List, ListItem, Button, Divider } from '@mui/material';
+import { useContext, useEffect, useRef } from 'react'
 import SortBar from './SortBar'
 import { useNavigate } from 'react-router-dom'
+import GlobalStoreContext from '../store';
+import AuthContextProvider from '../auth'
 
 export default function BookmarksScreen() {
+    const firstRender = useRef(false);
+    const {store} = useContext(GlobalStoreContext)
+    const {auth} = useContext(AuthContextProvider)
     let navigate = useNavigate();
 
-    let latestUpdates = [["Work 1", "1"], ["Work 2", "21"], ["Work 3", "14"], ["Work 4", "1123"], ["Work 5", "41"], ["Work 6", "11"], ["Work 7", "12"], ["Work 8", "1"], 
-        ["Work 9", "1"], ["Work 10", "1"], ["Work 11", "1"], ["Work 12", "1"], ["Work 13", "1"], ["Work 14", "1"], ["Work 15", "1"], ["Work 16", "1"], ["Work 17", "1"], 
-        ["Work 18", "1"], ["Work 19", "1"], ["Work 21", "1"], ["Work 21", "1"], ["Work 22", "1"], ["Work 23", "1"], ["Work 24", "1"], ["Work 24", "1"], ["Work 26", "1"], 
-        ["Work 27", "1"], ["Work 28", "1"]]
+    useEffect(() => {
+        if (firstRender.current) {
+            if (store.mode === "comic") {
+                store.loadBookmarks(auth.session.comic_bookmarks);
+            }
+            else {
+                store.loadBookmarks(auth.session.story_bookmarks);
+            }
+        }
+        firstRender.current = true;
+    }, [store.mode])
+
+    function loadWork(workId) {
+        store.loadWork(workId);
+        navigate("/" + store.mode + "/" + workId);
+    }
+
+    function handleChapter(workId, chapterId) {
+        store.loadWorkAndChapter(workId, chapterId); 
+        navigate("/chapter/");
+    }
+
+    function handleUnbookmark(workId) {
+        let session = auth.session;
+        if (store.mode === "comic") {
+            session.comic_bookmarks.splice(session.comic_bookmarks.indexOf(workId), 1);
+        }
+        else {
+            session.story_bookmarks.splice(session.story_bookmarks.indexOf(workId), 1);
+        }
+        auth.updateUser(session);
+        store.removeBookmark(workId);
+    }
 
     return (
-        <Box>
-            <div id = "bookmarks-title">
+        <div>
+            <div id="bookmarks-title">
                 Your Bookmarks
             </div>
             <div className="search_list">
                 <SortBar />
             </div>  
-            <Box xs={12} sx = {{ position: 'relative', width: '80%', height: '100%', left: '10%', maxWidth: '1780px' }}>
-                <Grid pt={4} container item xs={12} sx={{ width: '100%', borderRadius: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', position: 'relative', left: '1.5%' }}>
+            <Box id="bookmarks_container" xs={12}>
+                <Grid id="bookmarks_label_container" container item xs={12}>
                     <Grid item xs={4.9}>
-                        <Typography sx={{ color: 'white', fontSize: 20 }}>Name</Typography>
+                        <div id="bookmarks_label">Name</div>
                     </Grid>
                     <Grid item xs={1}>
-                        <Typography sx={{ color: 'white', fontSize: 20 }}>Latest</Typography>
+                        <div id="bookmarks_label">Latest</div>
                     </Grid>
                 </Grid>
-                <Divider pt={4} sx={{ backgroundColor: '#4e4e4e', width: '98%', position: 'relative', left: '1%' }}/>
+                <Divider id="bookmarks_divider" pt={4}/>
                 <Grid item xs = {12}>
-                    <List sx={{ width: '100%', height: '100%' }}>
+                    <List id="bookmarks_list">
                     {
-                        latestUpdates.map((work, index) => (
-                            <ListItem key={ "bookmark" + index } sx={{ height: '36px' }}>
-                                <Grid item 
-                                      container xs={12} 
-                                      sx={{ 
-                                            width: '100%', borderRadius: 1, display: 'flex', alignItems: 'flex-start', 
-                                            justifyContent: 'flex-start', backgroundColor: (index % 2 === 0) ? '#2d2d2d' : 'none' 
-                                          }}
-                                >
+                        store.works.map((work, index) => (
+                            <ListItem key={"bookmark" + index} id="bookmarks_item">
+                                <Grid id={(index % 2 === 0) ? "bookmarks_even" : "bookmarks_odd"}
+                                      item 
+                                      container xs={12}>
                                     <Grid item xs={5}>
-                                        <Button onClick = {() => navigate('/comic/')} sx={{ color: 'white', flexGrow: 1 }}>{ work[0] }</Button>
+                                        <Button onClick={() => loadWork(work._id)} sx={{ color: 'white' }}>{ work.title }</Button>
                                     </Grid>
                                     <Grid item xs={6.5}>
-                                        <Button onClick = {() => navigate('/chapter/')} sx={{ color: 'white', height: '100%' }}>Chapter { work[1] }</Button>
+                                    {
+                                        (work.chapters.length > 0) ?
+                                            <Button onClick={() => handleChapter(work._id, JSON.parse(work.chapters[work.chapters.length - 1]).id)} 
+                                                    sx={{ color: 'white' }}>
+                                            {
+                                                (work.chapters.length > 0) ? JSON.parse(work.chapters[work.chapters.length - 1]).name : ""
+                                            }
+                                            </Button>
+                                        : ""
+                                    }
                                     </Grid>
                                     <Grid item xs={0.5}>
-                                        <Button onClick = {() => navigate('/chapter/')} sx={{ color: 'white', height: '100%' }}>Remove</Button>
+                                        <Button onClick={() => handleUnbookmark(work._id)} sx={{ color: '#9c4247' }}>Remove</Button>
                                     </Grid>
                                 </Grid>
                             </ListItem>
@@ -57,6 +96,6 @@ export default function BookmarksScreen() {
                     </List>
                 </Grid>
             </Box>
-        </Box>
+        </div>
     )
 }

@@ -80,6 +80,7 @@ updateStory = async (req, res) => {
         old.genres = body.genres;
         old.description = body.description;
         old.published = body.published;
+        old.ratings = body.ratings;
         old.chapters = body.chapters;
         //old.comments = body.comments;
 
@@ -211,11 +212,32 @@ getStories = async (req, res) => {
     }
 }
 
+getStoriesById = async (req, res) => {
+    try {
+        const ids = req.body;
+        if (!ids)
+            return res.status(400).json({ success: false, errorMessage: "Missing image ids"});
+        let arr = [];
+        for (let i = 0; i < ids.length; i++) {
+            let found = await Story.findById(ids[i]);
+            if (!found)
+                return res.status(400).json({ success: false, errorMessage: "Image " + ids[i] + " not found!"});
+            else   
+                arr.push(found);
+        }
+        
+        return res.status(200).json({ success: true, data: arr });
+    }
+    catch (err) {
+        return res.status(500);
+    }
+}
+
 createStoryChapter = async (req, res) => {
     try {
         const { name, chapter } = req.body;
-        console.log(name + " " + chapter);
-        if (!name || chapter === null) {
+        //console.log(name + " " + chapter);
+        if (!name) {
             return res.status(400).json({
                 success: false,
                 error: "Must specify information to create the story chapter."
@@ -240,6 +262,7 @@ createStoryChapter = async (req, res) => {
 updateStoryChapter = async (req, res) => {
     try {
         const body = req.body;
+        console.log(body)
         if(!body) {
             return res.status(400).json({
                 success: false,
@@ -280,15 +303,18 @@ deleteStoryChapter = async (req, res) => {
 
 getStoryChapterById = async (req, res) => {
     try {
-        const found = await StoryChapter.findById({ _id: req.params.id });
-        if (!found)
-            return res.status(400).json({success: false, message: "Story chapter not found"});
-        
-        return res.status(200).json({success: true, story: found});
+        const id = req.params.id;
+        if (!id) 
+            return res.status(400).json({success: false, message: "id field cannot be empty!"});
+
+        const chapter = await StoryChapter.findById(id);
+        if (!chapter)
+            return res.status.json({success: false, message: "Story chapter with this id does not exist!"})
+
+        return res.status(200).json({success: true, data: chapter}).send();
     }
     catch (err) {
-        console.error("getStoryChapterById failed: " + err);
-        return res.status(500).send();
+        return res.status(500);
     }
 }
 
@@ -302,6 +328,7 @@ module.exports = {
     getStoriesByGenre,
     getStoriesByCreator,
     getStories,
+    getStoriesById,
     createStoryChapter,
     updateStoryChapter,
     deleteStoryChapter,

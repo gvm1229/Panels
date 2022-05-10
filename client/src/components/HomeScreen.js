@@ -1,5 +1,5 @@
 import { Box, Typography, Grid, List, ListItem, Button } from '@mui/material'
-import { useContext, useEffect } from 'react'
+import { useContext, useLayoutEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GlobalStoreContext }  from '../store';
 
@@ -7,22 +7,27 @@ function HomeScreen() {
     const {store} = useContext(GlobalStoreContext)
     let navigate = useNavigate();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         store.home();
     }, [store.mode])
 
     function handleLoad(workId) {
         store.loadWork(workId);
-        navigate("/comic/" + workId);
+        navigate(((store.mode === "comic") ? "/comic/" : "/story/") + workId);        
+    }
+
+    function handleChapter(workId, chapterId) {
+        store.loadWorkAndChapter(workId, chapterId); 
+        navigate("/chapter/");
     }
     
     return (
-        <Grid container>
+        <Grid id="home" container>
             <Grid item xs={12}>
                 <Grid id="home_grid_container" item xs={12}>
                     <Box id="home_image_container">
                     {
-                        (store.images && store.images.length === 8) ? 
+                        (store.images && store.images.length <= 8) ? 
                             store.images.map((image, index) => (
                                 <Button id="home_image_selector" key={"featured" + index}>
                                     <img className = "image-contain" 
@@ -35,13 +40,11 @@ function HomeScreen() {
                     }
                     </Box>
                 </Grid>
-
                 <Grid id="latest_updates_title_container" item xs={12}>
                     <Typography id="latest_updates_title">
                         Latest Updates
                     </Typography>
                 </Grid>
-
                 <Grid id="latest_updates_grid_container" item xs={12}>
                     <Box id="latest_updates_box_container" xs={12}>
                         <List id="latest_updates_list" container="true">
@@ -52,7 +55,15 @@ function HomeScreen() {
                                         <Box sx={{ flexGrow: 1 }}>
                                             <Button id="home_button" onClick={() => handleLoad(work._id)}>{work.title}</Button>
                                         </Box>
-                                        <Button id="home_button" onClick={() => navigate('/chapter/')}>{"Chapter " + index}</Button>
+                                        {
+                                            (work.chapters.length > 0) ?
+                                                (
+                                                <Button id="home_button" onClick={() => handleChapter(work._id, JSON.parse(work.chapters[work.chapters.length - 1]).id)}>
+                                                    {JSON.parse(work.chapters[work.chapters.length - 1]).name}
+                                                </Button> 
+                                                )
+                                            : ""
+                                        }
                                     </Box>
                                 </ListItem>
                             ))

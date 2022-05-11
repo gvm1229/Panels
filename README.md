@@ -9,7 +9,7 @@ Key features of the web app
 
 Technologies used
 
-* Mongo DB
+* MongoDB
 * Express.js
 * React.js
 * Node.js

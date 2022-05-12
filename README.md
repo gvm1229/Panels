@@ -13,6 +13,9 @@ Technologies used
 * Express.js
 * React.js
 * Node.js
+* Nodemailer (mailing, used for password recovery)
+* Bcrypt (password hashing)
+* JWT (user authentication)
 * Konva (Comic drawing)
 * Quill (Story text editing)
 

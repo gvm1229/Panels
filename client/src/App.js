@@ -15,7 +15,7 @@ import {
     BookmarksScreen,
     SettingsScreen,
     ProfileScreen,  
-    ComicScreen,
+    WorkScreen,
     UploadComic,
     UploadChapter,
     Storyboard,
@@ -41,13 +41,13 @@ const App = () => {
                         <Route exact path="/bookmarks/" element={< BookmarksScreen />} />
                         <Route exact path="/settings/" element={< SettingsScreen />} />
                         <Route exact path="/profile/:id" element={< ProfileScreen />} />
-                        <Route exact path="/comic/:id" element={< ComicScreen />} />
-                        <Route exact path="/story/:id" element={< ComicScreen />} />
+                        <Route exact path="/comic/:id" element={< WorkScreen />} />
+                        <Route exact path="/story/:id" element={< WorkScreen />} />
                         <Route exact path="/uploadcomic" element={< UploadComic />} />
                         <Route exact path="/uploadstory" element={< UploadComic />} />
                         <Route exact path="/uploadchapter" element={< UploadChapter />} />
                         <Route exact path="/storyboard/" element={< Storyboard />} />
-                        <Route exact path="/chapter/" element={< ChapterScreen />}/>
+                        <Route exact path="/chapter/:id" element={< ChapterScreen />}/>
                         <Route exact path="/comiceditor/" element={< ComicEditor />}/>
                         <Route exact path="/editwork/" element={< EditWorkScreen />}/>
                         <Route exact path="/storyeditor/" element={ <StoryEditor />} />

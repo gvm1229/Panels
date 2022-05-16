@@ -279,6 +279,9 @@ function GlobalStoreContextProvider(props) {
                         }
                     })
                 }
+                else {
+                    console.error("store.home get images error")
+                }
             }
         }
         catch (err) {
@@ -289,16 +292,15 @@ function GlobalStoreContextProvider(props) {
     store.sortWorks = async function(value) {
         let sorted = store.filteredWorks.slice();
         let sortedAll = store.works.slice();
-        if (value == 0) {
+        if (value === "0") {
             sorted = sorted.sort((a, b) => { return (b.published > a.published) - (b.published < a.published) });
             sortedAll = sorted.sort((a, b) => { return (b.published > a.published) - (b.published < a.published) });
         }
-        else if (value == 1) {
+        else if (value === "1") {
             sorted = sorted.sort((a, b) => { return b.views-a.views });
             sortedAll = sorted.sort((a, b) => { return b.views-a.views });
-            
         }
-        else if (value == 2) {
+        else if (value === "2") {
             sorted = sorted.sort((a, b) => {
                 let ratingA = 0;
                 let ratingB = 0;
@@ -323,7 +325,7 @@ function GlobalStoreContextProvider(props) {
                 return ratingB - ratingA;
             })
         }
-        else if (value == 3) {
+        else if (value === "3") {
             sorted = sorted.sort((a, b) => { return a.title.localeCompare(b.title) });
             sortedAll = sortedAll.sort((a, b) => { return a.title.localeCompare(b.title) });
         }
@@ -578,12 +580,7 @@ function GlobalStoreContextProvider(props) {
             //          continue;
             //      }
             //}
-            if (store.mode === "comic") {
-                store.loadProfileComics(auth.user._id);
-            }
-            else {
-                store.loadProfileStories(auth.user._id);
-            }
+            store.loadProfileWorks(auth.user._id);
         }
     }
 
@@ -713,17 +710,46 @@ function GlobalStoreContextProvider(props) {
         let response = await api.updateComicChapter(chapterDraft);
         if (response.status === 200) {
             let updated = response.data.data;
-            response = await api.getImagesById(newImages);
+            response = await api.getImagesById(updated.images);
             if (response.status === 200) {
                 let newImages = response.data.data;
+                console.log("NEW IMAGES : " + newImages)
                 storeReducer({
                     type: GlobalStoreActionType.UPDATE_COMIC_CHAPTER,
                     payload: {
                         chapter: updated,
-                        chapter_images: newImages
+                        images: newImages
                     }
                 })
+                let newChapters = store.work.chapters;
+                let index = newChapters.findIndex(function(element){
+                    return JSON.parse(element).id === updated._id
+                });
+                newChapters[index] = (JSON.stringify({
+                    id: updated._id,
+                    name: updated.name,
+                    uploaded: updated.uploaded
+                }))
+                let currentDraft = store.work;
+                currentDraft.chapters = newChapters;
+                response = await api.updateComic(currentDraft);
+                if (response.status === 200) {
+                    storeReducer({
+                        type: GlobalStoreActionType.LOAD_WORK,
+                        payload: {
+                            work: currentDraft,
+                            image: store.image
+                        }
+                    })
+                    console.log("comic updated")
+                }
             }
+            else {
+                console.error("store.updatecomicchapter getimages failed")
+            }
+        }
+        else {
+            console.error("store.updatecomicchapter failed")
         }
     }
 
@@ -862,6 +888,28 @@ function GlobalStoreContextProvider(props) {
                 type: GlobalStoreActionType.UPDATE_STORY_CHAPTER,
                 payload: updated
             })
+            let newChapters = store.work.chapters;
+            let index = newChapters.findIndex(function(element){
+                return JSON.parse(element).id === updated._id
+            });
+            newChapters[index] = (JSON.stringify({
+                id: updated._id,
+                name: updated.name,
+                uploaded: updated.uploaded
+            }))
+            let currentDraft = store.work;
+            currentDraft.chapters = newChapters;
+            response = await api.updateStory(currentDraft);
+            if (response.status === 200) {
+                storeReducer({
+                    type: GlobalStoreActionType.LOAD_STORY_CHAPTER,
+                    payload: updated
+                })
+                console.log("story updated")
+            }
+            else {
+                console.log(response);
+            }
         }
     }
 
@@ -909,13 +957,14 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.publish = async function (id) {
+    store.publish = async function(id) {
         if (store.mode === "comic") {
             store.publishComic(id);
         }
         else {
             store.publishStory(id);
         }
+        store.loadProfileWorks(auth.user._id);
     }
 
     store.loadProfileStories = async function(id) {

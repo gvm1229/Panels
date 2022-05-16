@@ -14,6 +14,10 @@ body {
   font-family: "Poppins";
 }
 
+textarea {
+  resize: none;
+}
+
 .sort_button, .sort_label, .filter_label, .filter_button {
   margin: 5px;
   border: transparent;
@@ -103,6 +107,7 @@ html, body {
   position: relative;
   background-color: #4E4E4E;
   display: flex;
+  font-family: "Poppins";
   width: 24%;
   min-width: 150px;
   max-width: 10vw;
@@ -257,7 +262,12 @@ html, body {
   border-radius: 4px;
   color: white;
   font-size: 15px;
+  font-family: inherit;
   padding-left: 5px;
+}
+
+#upload_work_name:focus {
+  outline: 1px solid #9c4247;
 }
 
 #upload_work_description {
@@ -269,7 +279,12 @@ html, body {
   border-radius: 4px;
   color: white;
   font-size: 15px;
+  font-family: inherit;
   padding-left: 5px;
+}
+
+#upload_work_description:focus {
+  outline: 1px solid #9c4247;
 }
 
 #upload_work_image {
@@ -464,6 +479,25 @@ html, body {
   left: 3%;
 }
 
+#edit_chapter_title {
+  height: 28px;
+  width: 700px;
+  position: relative;
+  top: 15%;
+  background-color: #3d3d3d;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 1em;
+  font-family: inherit;
+  padding-left: 7px;
+  margin-left: 10%;
+}
+
+#edit_chapter_title:focus {
+  outline: 1px solid #9c4247;
+}
+
 
 
 /* HomeScreen */
@@ -573,11 +607,32 @@ html, body {
   overflow-y: scroll;
 }
 
-#profile_image {
+#profile_image_container {
   position: relative;
-  top: 15%;
+  height: 100%;
+}
+
+#profile_input {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0%;
+  cursor: pointer;
+}
+
+#profile_icon {
   color: #4e4e4e;
-  font-size: 20em;
+  font-size: 320px;
+}
+
+#profile_image {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
 }
 
 #profile_works_card {
@@ -622,6 +677,23 @@ html, body {
   font-size: 1.5em;
 }
 
+#profile_description {
+  height: 100px;
+  width: 100%;
+  background-color: #2d2d2d;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-family: inherit;
+  margin: 10px;
+  text-align: justify;
+  text-align-last: center
+}
+  
+#profile_description:focus {
+  outline: 1px solid #9c4247;
+}
+
 .profile_centered {
   display: flex;
   justify-content: center;
@@ -630,7 +702,7 @@ html, body {
 
 
 
-/* ComicScreen */
+/* WorkScreen */
 
 .comic_centered {
   display: flex;
@@ -656,7 +728,7 @@ html, body {
 #comic_info_grid {
   display: flex;
   justify-content: flex-end;
-  padding-right: 100px;
+  padding-right: 70px;
 }
 
 #comic_cover_box {
@@ -725,6 +797,7 @@ html, body {
   height: 100%;
   max-height: 50vh;
   overflow-y: scroll;
+  margin-bottom: 10%;
 }
 
 #comic_chapter {
@@ -925,4 +998,10 @@ html, body {
   color: white;
   height: 50px;
   margin-left: 100px;
+}
+
+
+/* editor */
+#editor-toolbar {
+  display: flex;
 }

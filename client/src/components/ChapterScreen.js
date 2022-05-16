@@ -11,6 +11,7 @@ export default function ChapterScreen() {
     let navigate = useNavigate()
 
     const [chapter, setChapter] = useState("");
+    const [index, setIndex] = useState(0);
 
     useEffect(() => {
         if (store.chapter !== null) {
@@ -18,8 +19,15 @@ export default function ChapterScreen() {
         }
     }, [store.chapter])
 
+    useEffect(() => {
+        if (store.work !== null && store.chapter !== null) {
+            setIndex(currentIndex());
+        }
+    }, [store.work])
+
     const switchChapter = (event) => {
         setChapter(event.target.value);
+        setIndex(store.work.chapters.map(x => JSON.parse(x).name).indexOf(event.target.value));
     }
 
     function changeChapter(chapterId) {
@@ -37,23 +45,23 @@ export default function ChapterScreen() {
 
     function handleClickFirst() {
         changeChapter(JSON.parse(store.work.chapters[0]).id);
+        setIndex(0);
     }
 
     function handleClickPrev() {
-        let index = currentIndex();
-
         changeChapter(JSON.parse(store.work.chapters[(index !== 0) ? index - 1 : 0]).id);
+        setIndex(index - 1);
     }
 
     function handleClickNext() {
-        let index = currentIndex();
         let last = store.work.chapters.length-1;
-
         changeChapter(JSON.parse(store.work.chapters[(index !== last) ? index + 1 : last]).id);
+        setIndex(index + 1);
     }
 
     function handleClickLast() {
         changeChapter(JSON.parse(store.work.chapters[store.work.chapters.length-1]).id);
+        setIndex(store.work.chapters.length - 1);
     }
 
     let display =
@@ -94,17 +102,18 @@ export default function ChapterScreen() {
                             </Button>
                         </Grid>
                         <Grid id="chapter_centered" item xs={0.5}>
-                            <Button id="button" variant="contained" onClick={handleClickFirst}>First</Button>
+                            <Button id="button" disabled={index === 0} variant="contained" onClick={handleClickFirst}>First</Button>
                         </Grid>
                         <Grid id="chapter_centered" item xs={0.5}>
-                            <Button id="button" variant="contained" onClick={handleClickPrev}>Prev</Button>
+                            <Button id="button" disabled={index === 0} variant="contained" onClick={handleClickPrev}>Prev</Button>
                         </Grid>
                         <Grid id="chapter_centered" item xs={4}>
-                            <FormControl>
+                            <FormControl sx={{ width: '60%' }}>
                                 <Select id="chapter_select" value={chapter} onChange={switchChapter} 
                                     sx={{ color: 'white', 
                                           backgroundColor: '#3d3d3d',
                                           height: '48px',
+                                          borderRadius: '25px',
                                           "& .MuiOutlinedInput-notchedOutline": { borderColor: 'transparent' }, 
                                           "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: 'transparent' },
                                           "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: '#9c4247' },
@@ -126,7 +135,7 @@ export default function ChapterScreen() {
                                                       value={JSON.parse(chapter).name}
                                                       onClick={() => changeChapter(JSON.parse(chapter).id)}
                                             >
-                                                <Typography>{"Chapter " + (index + 1) + ": " + JSON.parse(chapter).name}</Typography>
+                                                <Typography align="center">{"Chapter " + (index + 1) + ": " + JSON.parse(chapter).name}</Typography>
                                             </MenuItem>
                                         )) : ""
                                 }
@@ -134,10 +143,10 @@ export default function ChapterScreen() {
                             </FormControl>
                         </Grid>
                         <Grid id="chapter_centered" item xs={0.5}>
-                            <Button id="button" variant="contained" onClick={handleClickNext}>Next</Button>
+                            <Button id="button" disabled={(store.work !== null) ? index === store.work.chapters.length - 1 : true} variant="contained" onClick={handleClickNext}>Next</Button>
                         </Grid>
                         <Grid id="chapter_centered" item xs={0.5}>
-                            <Button id="button" variant="contained" onClick={handleClickLast}>Last</Button>
+                            <Button id="button" disabled={(store.work !== null) ? index === store.work.chapters.length - 1 : true} variant="contained" onClick={handleClickLast}>Last</Button>
                         </Grid>
                         <Grid item xs={3}></Grid>
                     </Grid>

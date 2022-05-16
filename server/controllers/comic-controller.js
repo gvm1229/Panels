@@ -6,7 +6,7 @@ const Konva = require('../models/konva-model')
 createComic = (req, res) => {   // tested 200
     try {
         const { title, creatorId, creatorName, genres, description, cover_data } = req.body;
-        if (!title || !creatorId || !creatorName || !cover_data || !genres || !description) {
+        if (!title || !creatorId || !creatorName || !cover_data || !genres) {
             console.log(creatorName)
             return res.status(400).json({
                 success: false,
@@ -117,6 +117,37 @@ getComicsById = async (req, res) => {
     }
     catch (err) {
         return res.status(500);
+    }
+}
+
+createImage = async (req, res) => {
+    try {
+        const { image_data } = req.body;
+        if (!image_data) {
+            return res.status(400).json({
+                success: false,
+                error: "Must specify an image."
+            });
+        }
+
+        const newImage = new Image({data: image_data});
+        await newImage.save().then(() => {
+            console.log("Image saved.")
+            return res.status(200).json({   
+                success: true,
+                image: newImage,
+                message: "Image has been successfully created."
+            });
+        }).catch(err => {
+            console.log("Image not created")
+            return res.status(500).json({
+                success: false,
+                error: err
+            });
+        });
+    }
+    catch (err) {
+        return res.status(500).send();
     }
 }
 
@@ -258,6 +289,7 @@ createComicChapter = async (req, res) => {       // tested 200
 updateComicChapter = async (req, res) => {
     try {
         const body = req.body;
+        console.log(body)
         if(!body) {
             return res.status(400).json({
                 success: false,
@@ -265,13 +297,30 @@ updateComicChapter = async (req, res) => {
             });
         }
 
+        console.log(body._id)
+
         const old = await ComicChapter.findById(body._id);
         if (!old)
             return res.status(400).json({success: false, message: "This comic chapter does not exist!"});
 
+        console.log("old images: " + old.images)
+        for (let i = 0; i < old.images.length; i++) {
+            const deleted = await Image.findOneAndDelete({_id: old.images[i]._id});
+        }
+
+        let images = body.images;
+        let arr = [];
+        for (let i = 0; i < images.length; i++) {
+            let newImage = new Image({data: images[i]});
+            await newImage.save();
+            arr.push(newImage._id);
+        }
+
+        console.log("chapter images updated")
+
         old.name = body.name;
         old.uploaded = body.uploaded;
-        old.images = body.images;
+        old.images = arr;
 
         await old.save();
         return res.status(200).json({success: true, data: old});
@@ -364,6 +413,7 @@ module.exports = {
     getComicsByCreator,
     getComics,
     getComicsById,
+    createImage,
     getImagesById,
     updateComic,
     createComicChapter,

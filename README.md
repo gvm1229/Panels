@@ -2,7 +2,7 @@
 
 Key features of the web app
 
-* Add, view, edit, delete comics & stories
+* Add, view, search, edit, delete comics & stories
 * Instant search for comics & stories
 * Feedback on comics & stories (Comments, Likes, Views)
 * Filtering and sorting comics & stories by their attributes (tags, title, views, etc.)
